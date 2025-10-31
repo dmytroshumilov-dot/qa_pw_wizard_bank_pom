@@ -1,6 +1,8 @@
 import { test } from '@playwright/test';
+import { BankHomePage } from '../../../src/pages/BankHomePage';
+import { BankManagerMainPage } from '../../../src/pages/manager/BankManagerMainPage';
 
-test('Assert manager can Login', async ({ page }) => {
+
   /* 
   Test:
   1. Open Wizard bank home page 
@@ -10,4 +12,18 @@ test('Assert manager can Login', async ({ page }) => {
   4. Assert button [Open Account] is visible
   5. Assert button [Customers] is visible
   */
+
+test('Assert manager can Login', async ({ page }) => {
+  const myBankHomePage = new BankHomePage(page);
+  await myBankHomePage.open()
+  
+  await myBankHomePage.clickManagerLoginButton();
+
+  const myBankManagerMainPage = new BankManagerMainPage(page);
+  await myBankManagerMainPage.waitForLoadingPage();
+  
+  await myBankManagerMainPage.ButtonIsVisible(myBankManagerMainPage.addCustomerButton);
+  await myBankManagerMainPage.ButtonIsVisible(myBankManagerMainPage.openAccountButton);
+  await myBankManagerMainPage.ButtonIsVisible(myBankManagerMainPage.customersButton);
+  
 });

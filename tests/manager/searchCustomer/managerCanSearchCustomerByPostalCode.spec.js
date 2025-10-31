@@ -1,9 +1,12 @@
 import { test } from '@playwright/test';
 import { faker } from '@faker-js/faker';
+import { AddCustomerPage } from '../../../src/pages/manager/AddCustomerPage';
+import { CustomersListPage } from '../../../src/pages/manager/CustomersListPage';
+
 
 let firstName;
 let lastName;
-let postalCode;
+let postCode;
 
 test.beforeEach(async ({ page }) => {
   /* 
@@ -14,9 +17,18 @@ test.beforeEach(async ({ page }) => {
   4. Fill the Postal Code.
   5. Click [Add Customer].
   */
+  const myAddCustomerPage = new AddCustomerPage(page);
   firstName = faker.person.firstName();
   lastName = faker.person.lastName();
-  postalCode = faker.location.zipCode();
+  postCode = faker.location.zipCode();
+
+  await myAddCustomerPage.open();
+  await myAddCustomerPage.fillTheField(myAddCustomerPage.custFirstName, firstName);
+  await myAddCustomerPage.fillTheField(myAddCustomerPage.custLastName, lastName);
+  await myAddCustomerPage.fillTheField(myAddCustomerPage.custPostCode, postCode);
+  await myAddCustomerPage.pressAddCustomerButton();
+  await myAddCustomerPage.reloadPage();
+  await myAddCustomerPage.waitForLoadingPage();
 });
 
 test('Assert manager can search customer by Postal Code', async ({ page }) => {
@@ -27,4 +39,9 @@ test('Assert manager can search customer by Postal Code', async ({ page }) => {
   3. Assert customer row is present in the table. 
   4. Assert no other rows is present in the table.
   */
+ const myCustomersListPage = new CustomersListPage(page);
+   await myCustomersListPage.open();
+    await myCustomersListPage.searchBy(postCode);
+    await myCustomersListPage.checkFirstNameInLastRow(firstName);
+    await myCustomersListPage.assertThereIsOnlyOneRow();
 });
