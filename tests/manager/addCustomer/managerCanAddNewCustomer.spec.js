@@ -1,8 +1,9 @@
 import { test } from '@playwright/test';
 import { faker } from '@faker-js/faker';
+import { AddCustomerPage } from '../../../src/pages/manager/AddCustomerPage';
+import { CustomersListPage } from '../../../src/pages/manager/CustomersListPage';
 
-test('Assert manager can add new customer', async ({ page }) => {
-  /* 
+/* 
   Test:
   1. Open add customer page by link
     https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager/addCust
@@ -26,4 +27,27 @@ test('Assert manager can add new customer', async ({ page }) => {
   2. Do not rely on the customer row id for the steps 8-11. 
     Use the ".last()" locator to get the last row.
   */
+
+test('Assert manager can add new customer', async ({ page }) => {
+  const myAddCustomerPage = new AddCustomerPage(page);
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const postCode = faker.location.zipCode();
+
+  await myAddCustomerPage.open();
+  await myAddCustomerPage.fillTheField(myAddCustomerPage.custFirstName, firstName);
+  await myAddCustomerPage.fillTheField(myAddCustomerPage.custLastName, lastName);
+  await myAddCustomerPage.fillTheField(myAddCustomerPage.custPostCode, postCode);
+  await myAddCustomerPage.pressAddCustomerButton();
+  await myAddCustomerPage.reloadPage();
+  await myAddCustomerPage.waitForLoadingPage();
+  await myAddCustomerPage.openCustomerlist();
+
+  const myCustomersListPage = new CustomersListPage(page);
+  await myCustomersListPage.waitForLoadingPage();
+  await myCustomersListPage.checkFirstNameInLastRow(firstName);
+  await myCustomersListPage.checkLastNameInLastRow(lastName);
+  await myCustomersListPage.checkPostCodeInLastRow(postCode);
+  await myCustomersListPage.checkAccountsInLastRow('');
+  
 });
